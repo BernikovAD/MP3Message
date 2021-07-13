@@ -19,7 +19,7 @@ public class ItemMusicFileAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private final List<String> items;
     private static final String MESSAGE = "\nФайл скачан с zaycev.net";
-    private UserModel userModel = new UserModel();
+    private final UserModel userModel = new UserModel();
 
     public ItemMusicFileAdapter(List<String> items) {
         this.items = items;
@@ -36,6 +36,7 @@ public class ItemMusicFileAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int index) {
         TextView name = holder.itemView.findViewById(R.id.name_music_file);
+
         name.setText(String.format("%s", this.items.get(index)));
         holder.itemView.setOnClickListener(new RecyclerView.OnClickListener() {
             @Override
@@ -58,7 +59,7 @@ public class ItemMusicFileAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public int getItemCount() {
-        return this.items.size();
+        return items.size();
     }
 }
 

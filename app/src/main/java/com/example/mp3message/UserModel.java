@@ -3,6 +3,7 @@ package com.example.mp3message;
 import android.os.Environment;
 
 import java.io.File;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,16 +11,18 @@ import java.util.List;
 public class UserModel {
 
     //Строка название директории
-    private String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
+    private final String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
     File directory = new File(path);
 
     //Читаем директорию и заполняем List<Name>
     public List<String> readDir() {
-        File[] files = directory.listFiles();
         List<String> listMusicName = new ArrayList<>();
-        for (File file : files) {
-            if (accept(directory, file.getName())) { ;
-                listMusicName.add(file.getName());
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (accept(file.getName())) {
+                    listMusicName.add(file.getName());
+                }
             }
         }
         return listMusicName;
@@ -29,13 +32,12 @@ public class UserModel {
         return path;
     }
 
+
     //Проверяем на mp3
-    public boolean accept(File dir, String name) {
-        if (name.endsWith(".mp3") || name.endsWith(".MP3")) {
-            return true;
-        }
-        directory = new File(dir.getAbsolutePath() + "/" + name);
-        return directory.isDirectory();
+    public boolean accept(String name) {
+        String mimeType = URLConnection.guessContentTypeFromName(name);
+        System.out.println(mimeType);
+        return mimeType != null && mimeType.indexOf("audio") == 0;
     }
 }
 
