@@ -1,36 +1,62 @@
 package com.example.mp3message;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.os.Bundle;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class UserActivity extends AppCompatActivity {
-    private RecyclerView recyclerView;
-    private ItemMusicFileAdapter itemMusicFileAdapter;
-    private UserPresenterImpl userPresenter;
+    public static final int MY_PERMISSIONS_REQUEST_READ_MEDIA = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        init();
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_MEDIA);
+        } else {
+            init();
+        }
     }
 
-    private void init(){
+    private void init() {
         //инициализируем recyclerView
-        recyclerView = findViewById(R.id.recycler_view_item_music);
+        RecyclerView recyclerView = findViewById(R.id.recycler_view_item_music);
+        TextView emptyView = findViewById(R.id.no_active_jobs);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         //создаем презентер
-        userPresenter = new UserPresenterImpl();
-        //отправояем команду презентору чтобы тот вернул список файлов и отправляем все в адаптер, чтоб отобразить на экране
-        itemMusicFileAdapter = new ItemMusicFileAdapter(userPresenter.showListMusic());
-        recyclerView.setAdapter(itemMusicFileAdapter);
+        UserPresenterImpl userPresenter = new UserPresenterImpl();
+        if(userPresenter.showListMusic().size() == 0){
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        }else{
+            //отправояем команду презентору чтобы тот вернул список файлов и отправляем все в адаптер, чтоб отобразить на экране
+            ItemMusicFileAdapter itemMusicFileAdapter = new ItemMusicFileAdapter(userPresenter.showListMusic());
+            recyclerView.setAdapter(itemMusicFileAdapter);
+        }
+
+
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_PERMISSIONS_REQUEST_READ_MEDIA) {
+            if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                init();
+            }
+        }
+    }
 }
