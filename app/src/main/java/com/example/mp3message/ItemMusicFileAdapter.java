@@ -19,7 +19,7 @@ public class ItemMusicFileAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private final List<String> items;
     private static final String MESSAGE = "\nФайл скачан с zaycev.net";
-    private final UserModel userModel = new UserModel();
+    private final UserPresenterImpl userPresenter = new UserPresenterImpl();
 
     public ItemMusicFileAdapter(List<String> items) {
         this.items = items;
@@ -36,12 +36,11 @@ public class ItemMusicFileAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int index) {
         TextView name = holder.itemView.findViewById(R.id.name_music_file);
-
         name.setText(String.format("%s", this.items.get(index)));
         holder.itemView.setOnClickListener(new RecyclerView.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File file = new File(userModel.getPath() + items.get(index));
+                File file = new File(userPresenter.getPath() + items.get(index));
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("audio/*");
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
